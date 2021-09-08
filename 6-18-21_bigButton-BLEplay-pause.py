@@ -6,13 +6,14 @@ from adafruit_ble.advertising.standard import SolicitServicesAdvertisement
 from adafruit_ble_apple_media import AppleMediaService
 from digitalio import DigitalInOut, Direction, Pull
 
+#  button pin
 pin = DigitalInOut(board.D6)
 pin.direction = Direction.INPUT
 pin.pull = Pull.UP
 big_button = Debouncer(pin)
 
-# PyLint can't find BLERadio for some reason so special case it here.
-radio = adafruit_ble.BLERadio()  # pylint: disable=no-member
+#  BLE setup
+radio = adafruit_ble.BLERadio()
 a = SolicitServicesAdvertisement()
 a.solicited_services.append(AppleMediaService)
 radio.start_advertising(a)
@@ -26,6 +27,9 @@ known_notifications = set()
 button_state = False
 i = 0
 while radio.connected:
+    
+    #  found play/pause wasn't reliably working unless also recieving data from ams
+    
     for connection in radio.connections:
         if not connection.paired:
             connection.pair()
